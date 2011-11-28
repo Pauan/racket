@@ -1,7 +1,7 @@
 
 To run most of the tests, run:
- > (load "PATHTOHERE/all.ss")
-where PATHTOHERE is the path to this directory.  
+ > (load "PATHTOHERE/all.rktl")
+where PATHTOHERE is the path to this directory.
 
 Test failures may cause the test to stop before finishing, but most
 test failures will let the test continue, and a summary message at the
@@ -14,17 +14,17 @@ should be removed, but some "tmp<N>" files will remain. (The "tmp<N>"
 files are automatically replaced if the test suite is run again.)
 
 Additionally, test `expand' by running:
- > (load "PATHTOHERE/expand.ss")
+ > (load "PATHTOHERE/expand.rktl")
 
 Test compilation and writing/reading compiled code with:
- > (load "PATHTOHERE/compile.ss")
+ > (load "PATHTOHERE/compile.rktl")
 
 Run the standard tests with no output except for the results with:
- > (load "PATHTOHERE/quiet.ss")
+ > (load "PATHTOHERE/quiet.rktl")
 (Also get an error code -- use with scripts.)
 
 Run 3 copies of the test suite concurrently in separate threads:
- > (load "PATHTOHERE/parallel.ss")
+ > (load "PATHTOHERE/parallel.rktl")
 
 
 Please report bugs using Help Desk, or
