@@ -184,28 +184,28 @@ regcomp(char *expstr, rxpos exp, int explen, int pcre)
   if (reg(0, &flags, 0, 0, PARSE_CASE_SENS | PARSE_SINGLE_LINE | (pcre ? PARSE_PCRE : 0)) == 0) {
     FAIL("unknown regexp failure");
   }
-  
+
   /* Small enough for pointer-storage convention? */
   if (regcodemax >= 32767L)		/* Probably could be 65535L. */
     FAIL("regexp too big");
 
   if (regmaxbackposn >= regnpar)
     FAIL("backreference number is larger than the highest-numbered cluster");
-  
+
   /* Allocate space. */
   r = (regexp *)scheme_malloc_tagged(sizeof(regexp) + N_ITO_SPACE((unsigned)regcodemax));
   r->type = scheme_regexp_type;
-  
+
 #ifdef INDIRECT_TO_PROGRAM
   r->program = (char *)scheme_malloc_atomic((unsigned)regcodemax + 1);
 #endif
-  
+
   r->regsize = regcodemax;
 
   r->nsubexp = regnpar;
   r->ncounter = regncounter;
   r->maxlookback = regmaxlookback;
-  
+
   /* Second pass: emit code. */
   regparse = exp;
   regparse_end = exp + explen;
@@ -315,7 +315,7 @@ regcomp(char *expstr, rxpos exp, int explen, int pcre)
   if (regcode > r->regsize + sizeof(regexp))
     scheme_signal_error("regexp too large!");
 #endif
-  
+
   return(r);
 }
 
@@ -376,7 +376,7 @@ static unsigned char *extract_regstart(rxpos scan, int *_anch)
 
   do {
     retry = 0;
-    
+
     the_op = rOP(scan);
     switch (the_op) {
     case BOL:
@@ -627,8 +627,8 @@ reg(int paren, int *flagp, int paren_set, int lookahead, int parse_flags)
   }
 
   if ((brcount == 1)
-      && paren 
-      && (!paren_set || ((flags & SPFIXED) 
+      && paren
+      && (!paren_set || ((flags & SPFIXED)
 			 && (regmatchmin == regmatchmax)
 			 && (regmatchmax < 0x7FFFF)))
       && !lookahead) {
@@ -686,7 +686,7 @@ reg(int paren, int *flagp, int paren_set, int lookahead, int parse_flags)
 	ender = regnode(NOTHING);
       }
     } else {
-      ender = regnode(END);	
+      ender = regnode(END);
     }
     regtail(ret, ender);
 
@@ -731,8 +731,8 @@ regbranch(int *flagp, int parse_flags, int without_branch_node)
   else
     ret = 0;
   chain = 0;
-  while (regparse != regparse_end 
-	 && regparsestr[regparse] != '|' 
+  while (regparse != regparse_end
+	 && regparsestr[regparse] != '|'
 	 && regparsestr[regparse] != ')') {
     save_flags = flags;
     latest = regpiece(&flags, parse_flags, !chain && !without_branch_node);
@@ -789,7 +789,7 @@ regbranch(int *flagp, int parse_flags, int without_branch_node)
    * It might seem that this node could be dispensed with entirely, but the
    * endmarker role is not redundant.
    */
-static rxpos 
+static rxpos
 regpiece(int *flagp, int parse_flags, int at_start)
 {
   rxpos ret;
@@ -1069,7 +1069,7 @@ regpiece(int *flagp, int parse_flags, int at_start)
    * faster to run.  Backslashed characters are exceptions, each becoming a
    * separate node; the code is simpler that way and it's not worth fixing.
  */
-static rxpos 
+static rxpos
 regatom(int *flagp, int parse_flags, int at_start)
 {
   rxpos ret;
@@ -1100,7 +1100,7 @@ regatom(int *flagp, int parse_flags, int at_start)
     ret = regranges(parse_flags, at_start);
     *flagp |= HASWIDTH|SIMPLE;
     break;
-  case '[': 
+  case '[':
     --regparse;
     ret = regranges(parse_flags, at_start);
     *flagp |= HASWIDTH|SIMPLE;
@@ -1123,17 +1123,17 @@ regatom(int *flagp, int parse_flags, int at_start)
 	    parse_flags |= PARSE_SINGLE_LINE;
 	    regparse++;
 	    moded = 1;
-	  } else if ((regparsestr[regparse+1] == '-') 
+	  } else if ((regparsestr[regparse+1] == '-')
 		     && (regparsestr[regparse+2] == 'i')) {
 	    parse_flags |= PARSE_CASE_SENS;
 	    regparse += 2;
 	    moded = 1;
-	  } else if ((regparsestr[regparse+1] == '-') 
+	  } else if ((regparsestr[regparse+1] == '-')
 		     && (regparsestr[regparse+2] == 'm')) {
 	    parse_flags |= PARSE_SINGLE_LINE;
 	    regparse += 2;
 	    moded = 1;
-	  } else if ((regparsestr[regparse+1] == '-') 
+	  } else if ((regparsestr[regparse+1] == '-')
 		     && (regparsestr[regparse+2] == 's')) {
 	    parse_flags &= ~PARSE_SINGLE_LINE;
 	    regparse += 2;
@@ -1200,7 +1200,7 @@ regatom(int *flagp, int parse_flags, int at_start)
 	      regbackdepends = NULL;
 	    } else
 	      backdepends = NULL;
-	      
+
 	    if (!(flags & SPFIXED))
 	      *flagp &= ~SPFIXED;
 	    matchmin = regmatchmin;
@@ -1228,7 +1228,7 @@ regatom(int *flagp, int parse_flags, int at_start)
 		else
 		  backdepends = regbackdepends;
 	      }
-	      
+
 	      if (!(flags & SPFIXED))
 		*flagp &= ~SPFIXED;
 	      else {
@@ -1451,7 +1451,7 @@ regatom(int *flagp, int parse_flags, int at_start)
 
   if (!ret)
     FAIL("failed!?");
-	
+
   return ret;
 }
 
@@ -1463,7 +1463,7 @@ static int regcharclass(int c, char *map)
   case 'r': map['\r'] = 1; break;
   case 't': map['\t'] = 1; break;
   case 'a': map['\a'] = 1; break;
-  case 'e': map['\e'] = 1; break; /* this might need to use (char)27 */
+  case 'e': map['\x1B'] = 1; break;
   case 'f': map['\f'] = 1; break;
   case 'v': map['\v'] = 1; break;
   case 'd':
@@ -1623,14 +1623,14 @@ static int is_posix_char_class(char *str, int pos, int len, char *map)
       return 1;
     }
   }
-  
-  if ((pos + 7 <= len) 
+
+  if ((pos + 7 <= len)
       && !scheme_strncmp(":word:]", str XFORM_OK_PLUS pos, 7)) {
     if (map) {
       regcharclass('w', map);
     }
     return 1;
-  } 
+  }
 
   if ((pos + 9 <= len)
       && !scheme_strncmp(":xdigit:]", str XFORM_OK_PLUS pos, 9)) {
@@ -1738,7 +1738,7 @@ static char *regrange(int parse_flags, char *map)
 	can_range = 1;
       }
       regparse += 2;
-    } else if ((regparsestr[regparse] == '[') 
+    } else if ((regparsestr[regparse] == '[')
 	       && (parse_flags & PARSE_PCRE)
 	       && (regparsestr[regparse+1] == ':')
 	       && is_posix_char_class(regparsestr, regparse + 1, regparse_end, map)) {
@@ -1752,9 +1752,9 @@ static char *regrange(int parse_flags, char *map)
       c = UCHAR(regparsestr[regparse++]);
       map[c] = 1;
       if (!(parse_flags & PARSE_CASE_SENS)) {
-	c = rx_tolower(c); 
+	c = rx_tolower(c);
 	map[c] = 1;
-	c = rx_toupper(c); 
+	c = rx_toupper(c);
 	map[c] = 1;
       }
       can_range = 1;
@@ -1806,7 +1806,7 @@ regranges(int parse_flags, int at_start)
             break;
           }
 	  regcharclass(regparsestr[regparse], new_map);
-          
+
 	} else
 	  new_map[c] = 1;
       } else
@@ -1839,7 +1839,7 @@ regranges(int parse_flags, int at_start)
     } else
       break;
 
-    /* If the most recently parsed range is not 
+    /* If the most recently parsed range is not
        continued by a branch or the end of a sub-sequence,
        then abandon it, because it actually belongs
        with a new sequence. */
@@ -1848,7 +1848,7 @@ regranges(int parse_flags, int at_start)
 	&& (regparsestr[regparse] != '|')
 	&& (regparsestr[regparse] != ')'))
       break;
-    
+
     /* We'll keep it. Merge char maps so far: */
     if (accum_map) {
       for (c = 0; c < 256; c++) {
@@ -1859,7 +1859,7 @@ regranges(int parse_flags, int at_start)
       new_map = NULL;
     }
     save_regparse = regparse;
-    
+
     /* If we're at the end, or if we can only do one, then we're done. */
     if (!at_start
 	|| (regparsestr[regparse] != '|')
@@ -2029,7 +2029,7 @@ regunicode(int negate)
     negate = !negate;
     regparse++;
   }
-  
+
   len = 0;
   while ((regparsestr[regparse + len] != '}')
 	 && (regparse + len < regparse_end)) {
@@ -2134,7 +2134,7 @@ regnode(char op)
 
   if (regcode > regcodemax)
     regcodemax = regcode;
-    
+
   return ret;
 }
 
@@ -2167,8 +2167,8 @@ static void
 regshift(int amt, rxpos opnd)
 {
   if (regcode + amt < regcodesize) {
-    memmove(regstr XFORM_OK_PLUS opnd + amt, 
-	    regstr XFORM_OK_PLUS opnd, 
+    memmove(regstr XFORM_OK_PLUS opnd + amt,
+	    regstr XFORM_OK_PLUS opnd,
 	    regcode - opnd);
   }
   regcode += amt;
@@ -2253,7 +2253,7 @@ regtail(rxpos p, rxpos val)
   if (scan + 2 >= regcodesize) {
     return;
   }
-  
+
   if (rOP(scan) == BACK)
     offset = scan - val;
   else
@@ -2293,7 +2293,7 @@ static int check_and_propagate_depends(void)
   int i, j;
   Scheme_Hash_Table *backdepends = regbackdepends, *ht, *next_ht = NULL;
   Scheme_Object *v;
-  
+
   while (backdepends) {
     for (i = backdepends->size; i--; ) {
       if (backdepends->vals[i]) {
@@ -2307,7 +2307,7 @@ static int check_and_propagate_depends(void)
 	    FAIL("*, +, or {...,} operand could be empty (via empty backreference)");
 	  }
 	  if (SCHEME_HASHTP(v)) {
-	    /* Check/propagate assumption. The fixpoint direction is 
+	    /* Check/propagate assumption. The fixpoint direction is
 	       determined by assuming "true" while recursively checking. */
 	    scheme_hash_set(regbackknown, backdepends->keys[i], scheme_true);
 	    if (!next_ht)
@@ -2397,11 +2397,11 @@ static MZ_INLINE int in_ranges_ci(char *str, rxpos a, int l, int c)
 /*
  * Forwards.
  */
-static int regtry(regexp *, char *, int, int, rx_lazy_str_t *, rxpos *, rxpos *, rxpos *, rxpos *, int *, Regwork *rw, rxpos, 
+static int regtry(regexp *, char *, int, int, rx_lazy_str_t *, rxpos *, rxpos *, rxpos *, rxpos *, int *, Regwork *rw, rxpos,
                   char *, rxpos, rxpos, int);
 static int regtry_port(regexp *, Scheme_Object *, Scheme_Object *, int nonblock,
 		       rxpos *, rxpos *, rxpos *, rxpos *, int *,
-		       char **, rxpos *, rxpos *, rxpos, Scheme_Object*, Scheme_Object*, rxpos, 
+		       char **, rxpos *, rxpos *, rxpos, Scheme_Object*, Scheme_Object*, rxpos,
                        char*, rxpos, rxpos,
 		       int, int *);
 static int regmatch(Regwork *rw, rxpos);
@@ -2472,7 +2472,7 @@ static void match_set(Regwork *rw, int no, rxpos start, rxpos end)
       if (rw->rewind_stack[i] == no)
         break;
     }
-    
+
     if (i >= count) {
       stack_room(rw, 3);
       i = count;
@@ -2497,7 +2497,7 @@ static void match_maybe(Regwork *rw, int no, rxpos pos)
       if (rw->rewind_stack[i] == (- no))
         break;
     }
-    
+
     if (i >= count) {
       stack_room(rw, 3);
       i = count;
@@ -2524,7 +2524,7 @@ static char *regprop();
    */
 static int
 regexec(const char *who,
-	regexp *prog, char *string, 
+	regexp *prog, char *string,
 	/* Used only for (bytes) strings: */
 	int stringpos, int stringlen, int stringorigin,
         /* For lazy strings: */
@@ -2535,14 +2535,14 @@ regexec(const char *who,
 	Scheme_Object *port, Scheme_Object *unless_evt, int nonblock,
 	/* Used only when port is non-NULL: */
 	char **stringp, int peek, int get_offsets, intptr_t save_prior,
-	Scheme_Object *discard_oport, 
+	Scheme_Object *discard_oport,
 	Scheme_Object *portstart, Scheme_Object *portend, Scheme_Object **_dropped,
         char *prefix, rxpos prefix_len, rxpos prefix_offset)
 {
   int spos;
   int *counters;
   Scheme_Object *dropped = NULL, *peekskip = NULL; /* used for ports, only */
- 
+
   /* Check validity of program. */
   if (UCHAR(prog->program[0]) != MAGIC) {
     regerror("corrupted program");
@@ -2558,10 +2558,10 @@ regexec(const char *who,
 
       if ((spos - stringpos) + l <= stringlen) {
 	if (prog->flags & REGEXP_MUST_CI)
-	  pos = l_strchr_ci(string, spos, stringlen - (spos - stringpos) - (l - 1), 
+	  pos = l_strchr_ci(string, spos, stringlen - (spos - stringpos) - (l - 1),
 			    (ITO(prog->program, (char *)prog) XFORM_OK_PLUS prog->regmust)[0]);
 	else
-	  pos = l_strchr(string, spos, stringlen - (spos - stringpos) - (l - 1), 
+	  pos = l_strchr(string, spos, stringlen - (spos - stringpos) - (l - 1),
 			 (ITO(prog->program, (char *)prog) XFORM_OK_PLUS prog->regmust)[0]);
 	if (pos == -1)
 	  return 0; /* Not present. */
@@ -2602,7 +2602,7 @@ regexec(const char *who,
       if (!SAME_OBJ(peekskip, scheme_make_integer(0))) {
         char tmp[1];
         intptr_t got;
-        got = scheme_get_byte_string_unless("regexp-match", port, 
+        got = scheme_get_byte_string_unless("regexp-match", port,
                                             tmp, 0, 1, 1,
                                             1, scheme_bin_minus(peekskip, scheme_make_integer(1)),
                                             unless_evt);
@@ -2623,7 +2623,7 @@ regexec(const char *who,
 	amt = 4096;
 
       dropped = scheme_make_integer(0);
-	
+
       if (amt) {
 	char *drain;
 
@@ -2633,10 +2633,10 @@ regexec(const char *who,
 	  got = scheme_get_byte_string(who, port, drain, 0, amt, 0, 0, 0);
 	  if (got != EOF) {
 	    Scheme_Object *delta;
-	    
+
 	    if (discard_oport)
 	      scheme_put_byte_string(who, discard_oport, drain, 0, got, 0);
-	    
+
 	    dropped = scheme_bin_plus(dropped, scheme_make_integer(got));
 	    delta = scheme_bin_minus(portstart, dropped);
 	    if (scheme_bin_gt(scheme_make_integer(amt), delta))
@@ -2659,9 +2659,9 @@ regexec(const char *who,
       int aborted = 0;
 
       *stringp = NULL;
-      if (regtry_port(prog, port, unless_evt, nonblock, 
-		      startp, maybep, endp, match_stack, counters, stringp, &len, &space, 0, 
-		      portend, peekskip, 0, prefix, prefix_len, prefix_offset, 0, 
+      if (regtry_port(prog, port, unless_evt, nonblock,
+		      startp, maybep, endp, match_stack, counters, stringp, &len, &space, 0,
+		      portend, peekskip, 0, prefix, prefix_len, prefix_offset, 0,
                       &aborted)) {
 	if (!peek) {
 	  /* Need to consume matched chars: */
@@ -2687,7 +2687,7 @@ regexec(const char *who,
 	  /* Need to consume all chars, up to portend */
 	  char *drain;
 	  intptr_t got;
-	  
+
 	  if (portend && SCHEME_INTP(portend) && SCHEME_INT_VAL(portend) < 4096) {
 	    got = SCHEME_INT_VAL(portend);
 	  } else
@@ -2715,8 +2715,8 @@ regexec(const char *who,
 	return 0;
       }
     } else
-      return regtry(prog, string, stringpos, stringlen, lazy_string, startp, maybep, endp, 
-                    match_stack, counters, 0, 
+      return regtry(prog, string, stringpos, stringlen, lazy_string, startp, maybep, endp,
+                    match_stack, counters, 0,
 		    stringorigin, prefix, prefix_len, prefix_offset, 0);
   }
 
@@ -2736,7 +2736,7 @@ regexec(const char *who,
 	if (!peek) {
 	  if (discard_oport)
 	    scheme_put_byte_string(who, discard_oport, *stringp, 0, discard, 0);
-	    
+
 	  scheme_get_byte_string(who, port, *stringp, 0, discard, 0, 0, 0);
 
 	  if (portend)
@@ -2756,7 +2756,7 @@ regexec(const char *who,
       }
 
       if (regtry_port(prog, port, unless_evt, nonblock,
-		      startp, maybep, endp, match_stack, counters, stringp, &len, &space, skip, 
+		      startp, maybep, endp, match_stack, counters, stringp, &len, &space, skip,
 		      portend, peekskip, 0, prefix, prefix_len, prefix_offset, 1,
                       &aborted)) {
 	if (!peek) {
@@ -2811,7 +2811,7 @@ static void read_more_from_regport(Regwork *rw, rxpos need_total);
 static int			/* 0 failure, 1 success */
 regtry(regexp *prog, char *string, int stringpos, int stringlen, rx_lazy_str_t *lazy_string,
        rxpos *startp, rxpos *maybep, rxpos *endp, rxpos *match_stack, int *counters,
-       Regwork *rw, rxpos stringorigin, 
+       Regwork *rw, rxpos stringorigin,
        char *prefix, rxpos prefix_len, rxpos prefix_offset,
        int unanchored)
 /* stringpos: where to start looking;
@@ -2900,7 +2900,7 @@ regtry(regexp *prog, char *string, int stringpos, int stringlen, rx_lazy_str_t *
 	  --stringlen;
 	}
       }
-      rw->input = stringpos;      
+      rw->input = stringpos;
       for (i = prog->nsubexp; i--; ) {
         startp[i] = rw->input_min - 1;
         endp[i] = rw->input_min - 1;
@@ -2972,7 +2972,7 @@ static void read_more_from_regport(Regwork *rw, rxpos need_total)
   if (rw->instr_size < need_total) {
     char *naya;
     intptr_t size = rw->instr_size;
-    
+
     size = size * 2;
     if (size < need_total)
       size += need_total;
@@ -2992,14 +2992,14 @@ static void read_more_from_regport(Regwork *rw, rxpos need_total)
     got = rw->input_maxend - rw->input_end;
   else
     got = rw->instr_size - rw->input_end;
-  
+
   if (rw->peekskip)
     peekskip = scheme_bin_plus(scheme_make_integer(rw->input_end), rw->peekskip);
   else
     peekskip = scheme_make_integer(rw->input_end);
 
   /* Fill as much of our buffer as possible: */
-  got = scheme_get_byte_string_unless("regexp-match", rw->port, 
+  got = scheme_get_byte_string_unless("regexp-match", rw->port,
 				      rw->instr, rw->input_end, got,
 				      (rw->nonblock
 				       ? 2   /* non-blocking read, as much as possible */
@@ -3024,15 +3024,15 @@ static void read_more_from_regport(Regwork *rw, rxpos need_total)
         peekskip = scheme_bin_plus(scheme_make_integer(rw->input_end), rw->peekskip);
       else
         peekskip = scheme_make_integer(rw->input_end);
-      
+
       rw->str = regstr; /* get_string can swap threads */
-      got = scheme_get_byte_string_unless("regexp-match", rw->port, 
+      got = scheme_get_byte_string_unless("regexp-match", rw->port,
                                           rw->instr, rw->input_end, need_total - rw->input_end,
                                           (rw->nonblock ? 2 : 0), /* blocking mode */
                                           1, peekskip,
                                           rw->unless_evt);
       regstr = rw->str;
-      
+
       if (!got && rw->nonblock) {
         rw->port = NULL; /* turn off further port reading */
         rw->unless_evt = NULL;
@@ -3057,8 +3057,8 @@ static void read_more_from_regport(Regwork *rw, rxpos need_total)
 static int
 regtry_port(regexp *prog, Scheme_Object *port, Scheme_Object *unless_evt, int nonblock,
 	    rxpos *startp, rxpos *maybep, rxpos *endp, rxpos *match_stack, int *counters,
-	    char **work_string, rxpos *len, rxpos *size, rxpos skip, 
-	    Scheme_Object *maxlen, Scheme_Object *peekskip, 
+	    char **work_string, rxpos *len, rxpos *size, rxpos skip,
+	    Scheme_Object *maxlen, Scheme_Object *peekskip,
 	    rxpos origin, char *prefix, rxpos prefix_len, rxpos prefix_offset,
 	    int read_at_least_one, int *_aborted)
 {
@@ -3086,7 +3086,7 @@ regtry_port(regexp *prog, Scheme_Object *port, Scheme_Object *unless_evt, int no
       && rw.port) {
     read_more_from_regport(&rw, rw.input_end + 1);
   }
-  
+
   *work_string = rw.instr;
   *len = rw.input_end;
   *size = rw.instr_size;
@@ -3109,7 +3109,7 @@ static Scheme_Object *regmatch_k(void)
   p->ku.k.p1 = NULL;
 
   regstr = rw->str; /* in case of thread swap */
- 
+
   res = regmatch(rw, p->ku.k.i1);
 
   return (res ? scheme_true : scheme_false);
@@ -3175,7 +3175,7 @@ regmatch(Regwork *rw, rxpos prog)
   }
 #endif
 
-  if (DECREMENT_FUEL(scheme_fuel_counter, 1) <= 0) { 
+  if (DECREMENT_FUEL(scheme_fuel_counter, 1) <= 0) {
     char *rs;
     rs = regstr;
     scheme_out_of_fuel();
@@ -3406,7 +3406,7 @@ regmatch(Regwork *rw, rxpos prog)
 	int nongreedy = (the_op == STAR2 || the_op == PLUS2 || the_op == STAR4);
 	rxpos next;  /* Next node. */
         int stack_pos, ok;
-	
+
 	/*
 	 * Lookahead to avoid useless match attempts
 	 * when we know what character comes next.
@@ -3693,7 +3693,7 @@ regmatch(Regwork *rw, rxpos prog)
 	} else {
           match_set(rw, no, rw->input_min - 1, rw->input_min - 1);
 	}
-	scan = NEXT_OP(scan);        
+	scan = NEXT_OP(scan);
       }
       break;
     case MAYBECONST:
@@ -3747,13 +3747,13 @@ regmatch(Regwork *rw, rxpos prog)
 	int c, data;
 	int v, pos;
 	int negate, bottom, top;
-	
+
 	data = rOPLEN(OPERAND(scan));
 
 	negate = data >> 13;
 	bottom = (data >> 6) & 0x3F;
 	top = data & 0x3F;
-	
+
 	NEED_INPUT(rw, is, 1);
 	if (is < rw->input_end) {
 	  c = UCHAR(INPUT_REF(rw, is));
@@ -3780,11 +3780,11 @@ regmatch(Regwork *rw, rxpos prog)
 	  }
 	} else
 	  return 0;
-  
+
 	is += pos;
 
 	v = scheme_general_category(v);
-	
+
 	if (negate) {
 	  if ((v >= bottom) && (v <= top))
 	    return 0;
@@ -3792,7 +3792,7 @@ regmatch(Regwork *rw, rxpos prog)
 	  if ((v < bottom) || (v > top))
 	    return 0;
 	}
-	
+
 	scan = NEXT_OP(scan);
       }
       break;
@@ -4154,8 +4154,8 @@ regstrcspn(char *s1, char *e1, char *s2)
 /*
    - regsub - perform substitutions after a regexp match
    */
-static 
-char *regsub(regexp *prog, char *src, int sourcelen, intptr_t *lenout, char *insrc, 
+static
+char *regsub(regexp *prog, char *src, int sourcelen, intptr_t *lenout, char *insrc,
              rxpos *startp, rxpos *endp, rxpos minpos,
              char *prefix, rxpos prefix_offset)
 {
@@ -4164,11 +4164,11 @@ char *regsub(regexp *prog, char *src, int sourcelen, intptr_t *lenout, char *ins
   intptr_t no;
   intptr_t len;
   intptr_t destalloc, destlen, srcpos;
-	
+
   destalloc = 2 * sourcelen;
   destlen = 0;
   dest = (char *)scheme_malloc_atomic(destalloc + 1);
-  
+
   srcpos = 0;
   while (srcpos < sourcelen) {
     c = src[srcpos++];
@@ -4282,7 +4282,7 @@ static unsigned char *make_room(unsigned char *r, int j, int need_extra, RoomSta
 static unsigned char *add_byte_range(const unsigned char *lo, const unsigned char *hi, int count,
 				     unsigned char *r, int *_j, RoomState *rs,
 				     /* did_alt => no need to start with "|" */
-				     int did_alt, 
+				     int did_alt,
 				     /* wrap_alts => wrap "(?:...)" around multiple alts */
 				     int wrap_alts)
      /* Adds alternatives for matching valid UTF-8 encodings lo
@@ -4374,7 +4374,7 @@ static unsigned char *add_byte_range(const unsigned char *lo, const unsigned cha
       p = lo[same_chars] + 1;
       did_alt = 0;
     }
-    
+
     /* Fill out [m0000, mxxxx] */
     if (q < hi[same_chars]) {
       r = make_room(r, j, 2, rs);
@@ -4391,7 +4391,7 @@ static unsigned char *add_byte_range(const unsigned char *lo, const unsigned cha
 
       q = hi[same_chars] - 1;
     }
-    
+
     /* Fill out [p0000,m0000) */
     if (p <= q) {
       /* Make the alternative that lets the initial digit vary,
@@ -4423,7 +4423,7 @@ static unsigned char *add_byte_range(const unsigned char *lo, const unsigned cha
       /* Close out the grouping */
       r = make_room(r, j, 1, rs);
       r[j++] = ')';
-    } 
+    }
   }
 
   *_j = j;
@@ -4468,7 +4468,7 @@ static unsigned char *add_range(unsigned char *r, int *_j, RoomState *rs,
 
           2[8-9]|[3-6][0-9]|7[0-5]
 
-     It gets more complex with three digits, say 
+     It gets more complex with three digits, say
      128 to 715:
 
        12[8-9]|1[3-6][0-9]|[2-6][0-9][0-9]|7[0-0][0-9]|71[0-5]
@@ -4507,7 +4507,7 @@ static int translate(unsigned char *s, int len, char **result, int pcre)
 
   rs.orig_len = len;
   rs.size = len;
-  
+
   r = (unsigned char *)scheme_malloc_atomic(rs.size + 1);
 
   /* We need to translate if the pattern contains any use of ".", if
@@ -4535,8 +4535,8 @@ static int translate(unsigned char *s, int len, char **result, int pcre)
 	  saw_big = 1;
 	else if (pcre && (s[k] == '\\') && (k + 1 < len))
 	  k++;
-        else if (pcre 
-                 && (s[k] == '[') 
+        else if (pcre
+                 && (s[k] == '[')
                  && (k + 1 < len)
                  && (s[k+1] == ':')
                  && is_posix_char_class((char *)s, k + 1, len, NULL)) {
@@ -4568,7 +4568,7 @@ static int translate(unsigned char *s, int len, char **result, int pcre)
 	memset(simple_on, 0, 128);
 	/* The ranges list is pairs of larger ranges */
 	ranges = scheme_null;
-	
+
 	p = 0;
 	if (not_mode)
 	  p++;
@@ -4587,9 +4587,9 @@ static int translate(unsigned char *s, int len, char **result, int pcre)
 	    }
 	    if (end < beg) {
 	      /* Bad regexp */
-	      FAIL("invalid range within square brackets in pattern");	      
+	      FAIL("invalid range within square brackets in pattern");
 	    }
-	      
+
 	    if ((beg > 127) || (end > 127)) {
 	      /* A big-char range */
 	      ranges = scheme_make_pair(scheme_make_pair(scheme_make_integer_value_from_unsigned(beg),
@@ -4734,7 +4734,7 @@ static int translate(unsigned char *s, int len, char **result, int pcre)
 	range_len *= 2;
 	/* Sort the ranges by the starting index. */
 	my_qsort(range_array, range_len >> 1, 2 * sizeof(unsigned int), compare_ranges);
-	
+
 	/* If a range starts below 128, fill in the simple array */
 	for (rp = 0; rp < range_len; rp += 2) {
 	  if (range_array[rp] < 128) {
@@ -4744,7 +4744,7 @@ static int translate(unsigned char *s, int len, char **result, int pcre)
 	    range_array[rp] = 128;
 	  }
 	}
-	
+
 	if (!(parse_flags & PARSE_CASE_SENS)) {
 	  for (p = 'a'; p <= 'z'; p++) {
 	    if (simple_on[p])
@@ -5078,14 +5078,14 @@ static Scheme_Object *do_make_regexp(const char *who, int is_byte, int pcre, int
     ((regexp *)re)->source = argv[0];
   else if (is_byte) {
     Scheme_Object *src;
-    src = scheme_make_immutable_sized_byte_string(SCHEME_BYTE_STR_VAL(argv[0]), 
-						  SCHEME_BYTE_STRTAG_VAL(argv[0]), 
+    src = scheme_make_immutable_sized_byte_string(SCHEME_BYTE_STR_VAL(argv[0]),
+						  SCHEME_BYTE_STRTAG_VAL(argv[0]),
 						  1);
     ((regexp *)re)->source = src;
   } else {
     Scheme_Object *src;
-    src = scheme_make_immutable_sized_char_string(SCHEME_CHAR_STR_VAL(argv[0]), 
-						  SCHEME_CHAR_STRTAG_VAL(argv[0]), 
+    src = scheme_make_immutable_sized_char_string(SCHEME_CHAR_STR_VAL(argv[0]),
+						  SCHEME_CHAR_STRTAG_VAL(argv[0]),
 						  1);
     ((regexp *)re)->source = src;
   }
@@ -5096,7 +5096,7 @@ static Scheme_Object *do_make_regexp(const char *who, int is_byte, int pcre, int
     if (SCHEME_TRUEP(b))
       ((regexp *)re)->flags |= REGEXP_JIT;
   }
-  
+
   return re;
 }
 
@@ -5169,7 +5169,7 @@ void scheme_clear_rx_buffers(void)
   match_stack_buffer_cache = NULL;
 }
 
-static Scheme_Object *gen_compare(char *name, int pos, 
+static Scheme_Object *gen_compare(char *name, int pos,
 				  int argc, Scheme_Object *argv[],
 				  int peek, int nonblock, int last_bytes)
 {
@@ -5180,7 +5180,7 @@ static Scheme_Object *gen_compare(char *name, int pos,
   Scheme_Object *iport, *oport = NULL, *startv = NULL, *endv = NULL, *dropped, *unless_evt = NULL;
   Scheme_Object *last_bytes_str = scheme_false, *srcin;
   rx_lazy_str_t *lazy_string = NULL;
-  
+
   if (SCHEME_TYPE(argv[0]) != scheme_regexp_type
       && !SCHEME_BYTE_STRINGP(argv[0])
       && !SCHEME_CHAR_STRINGP(argv[0]))
@@ -5189,7 +5189,7 @@ static Scheme_Object *gen_compare(char *name, int pos,
       && !SCHEME_INPUT_PORTP(argv[1])
       && !SCHEME_PATHP(argv[1]))
     scheme_wrong_type(name, peek ? "input-port" : "string, byte string, path, or input port", 1, argc, argv);
-  
+
   srcin = argv[1];
   if (SCHEME_PATHP(srcin)) {
     if (SCHEME_BYTE_STRINGP(argv[0])
@@ -5226,11 +5226,11 @@ static Scheme_Object *gen_compare(char *name, int pos,
       offset = 0x7FFFFFFF;
     }
     startv = argv[2];
-      
+
     if (argc > 3) {
       if (!SCHEME_FALSEP(argv[3])) {
 	endset = scheme_extract_index(name, 3, argc, argv, len + 1, 1);
-	
+
 	if (iport) {
 	  if (endset < 0) {
 	    /* argument was a bignum */
@@ -5249,7 +5249,7 @@ static Scheme_Object *gen_compare(char *name, int pos,
 	}
 	endv = argv[3];
       }
-      
+
       if (argc > 4) {
 	if (peek) {
 	  if (!SCHEME_FALSEP(argv[4])) {
@@ -5259,7 +5259,7 @@ static Scheme_Object *gen_compare(char *name, int pos,
 	      return NULL;
 	    }
 	    if (!iport) {
-	      scheme_arg_mismatch(name, 
+	      scheme_arg_mismatch(name,
 				  "progress evt cannot be used with string input: ",
 				  unless_evt);
 	    } else if (!SAME_OBJ(iport, SCHEME_PTR1_VAL(unless_evt))) {
@@ -5383,8 +5383,8 @@ static Scheme_Object *gen_compare(char *name, int pos,
   m = regexec(name, r, full_s, offset, endset - offset, offset, lazy_string,
               startp, maybep, endp, match_stack,
 	      iport, unless_evt, nonblock,
-	      &full_s, peek, pos, last_bytes_count, oport, 
-	      startv, endv, &dropped, 
+	      &full_s, peek, pos, last_bytes_count, oport,
+	      startv, endv, &dropped,
               prefix, prefix_len, prefix_offset);
 
   if (lazy_string)
@@ -5455,8 +5455,8 @@ static Scheme_Object *gen_compare(char *name, int pos,
                                           NULL, 0, -1,
                                           NULL, 0, 0);
               else {
-                uspd = scheme_utf8_decode((const unsigned char *)prefix, 
-                                          prefix_offset + prefix_len + (startp[i] - offset), 
+                uspd = scheme_utf8_decode((const unsigned char *)prefix,
+                                          prefix_offset + prefix_len + (startp[i] - offset),
                                           prefix_offset + prefix_len,
                                           NULL, 0, -1,
                                           NULL, 0, 0);
@@ -5470,7 +5470,7 @@ static Scheme_Object *gen_compare(char *name, int pos,
                                           NULL, 0, 0);
                 uepd += uspd;
               } else if (endp[i] < offset) {
-                uepd = scheme_utf8_decode((const unsigned char *)prefix, 
+                uepd = scheme_utf8_decode((const unsigned char *)prefix,
                                           prefix_offset + prefix_len + (endp[i] - offset),
                                           prefix_offset + prefix_len,
                                           NULL, 0, -1,
@@ -5488,14 +5488,14 @@ static Scheme_Object *gen_compare(char *name, int pos,
 	      startpd = scheme_make_integer(v);
 	      v = endp[i] + orig_offset;
 	      endpd = scheme_make_integer(v);
-	    
+
 	      if (iport) {
 		/* Increment by drop count: */
 		startpd = scheme_bin_plus(startpd, dropped);
 		endpd = scheme_bin_plus(endpd, dropped);
 	      }
 	    }
-	  
+
 	    l = scheme_make_pair(scheme_make_pair(startpd, endpd),
 				 l);
 	  } else {
@@ -5509,7 +5509,7 @@ static Scheme_Object *gen_compare(char *name, int pos,
               }
             } else if (endp[i] <= offset) {
               /* all in prefix */
-              rs = scheme_make_sized_offset_byte_string(prefix, 
+              rs = scheme_make_sized_offset_byte_string(prefix,
                                                         prefix_offset + (startp[i] - minpos),
                                                         endp[i] - startp[i],
                                                         1);
@@ -5534,7 +5534,7 @@ static Scheme_Object *gen_compare(char *name, int pos,
     dropped = scheme_false;
     last_bytes_str = scheme_false;
   }
-  
+
   if (!startp_buffer_cache || (r->nsubexp > rx_buffer_size)) {
     rx_buffer_size = r->nsubexp;
     startp_buffer_cache = startp;
@@ -5675,7 +5675,7 @@ static Scheme_Object *gen_replace(const char *name, int argc, Scheme_Object *arg
     if (!scheme_check_proc_arity(NULL, r->nsubexp, 2, argc, argv)) {
       scheme_raise_exn(MZEXN_FAIL_CONTRACT,
 		       "%s: regexp produces %d matches: %V; procedure does not accept %d arguments: %V",
-		       name, 
+		       name,
 		       r->nsubexp, (Scheme_Object *)r,
 		       r->nsubexp, argv[2]);
     }
@@ -5720,7 +5720,7 @@ static Scheme_Object *gen_replace(const char *name, int argc, Scheme_Object *arg
       m = regexec(name, r, source, srcoffset, sourcelen - srcoffset, 0, NULL,
                   startp, maybep, endp, NULL,
                   NULL, NULL, 0,
-                  NULL, 0, 0, 0, NULL, NULL, NULL, NULL, 
+                  NULL, 0, 0, 0, NULL, NULL, NULL, NULL,
                   prefix, prefix_len, prefix_offset);
 
       if (m && all && (startp[0] == endp[0])) {
@@ -5731,7 +5731,7 @@ static Scheme_Object *gen_replace(const char *name, int argc, Scheme_Object *arg
             amt = initial_char_len((unsigned char *)source, 0, sourcelen);
           else
             amt = 1;
-          
+
           prefix = scheme_malloc_atomic(amt + 1);
           prefix_len = amt;
           memcpy(prefix, source, amt);
@@ -5811,12 +5811,12 @@ static Scheme_Object *gen_replace(const char *name, int argc, Scheme_Object *arg
 	    destlen = SCHEME_BYTE_STRTAG_VAL(argv[2]);
 	  }
 	}
-	insert = regsub(r, deststr, destlen, &len, source, startp, endp, 
+	insert = regsub(r, deststr, destlen, &len, source, startp, endp,
                         minpos, prefix, prefix_offset);
       }
-      
+
       end = sourcelen;
-      
+
       startpd = startp[0];
       endpd = endp[0];
 
@@ -5828,14 +5828,14 @@ static Scheme_Object *gen_replace(const char *name, int argc, Scheme_Object *arg
       } else if (!all) {
 	char *result;
 	intptr_t total;
-	
+
 	total = len + (startpd - srcoffset) + (end - endpd);
-	
+
 	result = (char *)scheme_malloc_atomic(total + 1);
 	memcpy(result, source + srcoffset, startpd - srcoffset);
 	memcpy(result + (startpd - srcoffset), insert, len);
 	memcpy(result + (startpd - srcoffset) + len, source + endpd, (end - endpd) + 1);
-	
+
 	if (was_non_byte)
 	  return scheme_make_sized_utf8_string(result, total);
 	else
@@ -5854,7 +5854,7 @@ static Scheme_Object *gen_replace(const char *name, int argc, Scheme_Object *arg
           more = 0;
 
 	total = len + prefix_len + (startpd - srcoffset);
-	
+
 	naya = (char *)scheme_malloc_atomic(total + more + 1);
 	memcpy(naya, prefix, prefix_len);
 	memcpy(naya + prefix_len, source + srcoffset, startpd - srcoffset);
@@ -5877,15 +5877,15 @@ static Scheme_Object *gen_replace(const char *name, int argc, Scheme_Object *arg
     } else {
       char *result;
       intptr_t total, slen;
-      
+
       slen = sourcelen - srcoffset;
       total = prefix_len + slen;
-      
+
       result = (char *)scheme_malloc_atomic(total + 1);
       memcpy(result, prefix, prefix_len);
       memcpy(result + prefix_len, source + srcoffset, slen);
       result[prefix_len + slen] = 0;
-      
+
       if (was_non_byte)
 	return scheme_make_sized_utf8_string(result, total);
       else
@@ -5908,35 +5908,35 @@ static Scheme_Object *replace_star(int argc, Scheme_Object *argv[])
 
 static Scheme_Object *regexp_p(int argc, Scheme_Object *argv[])
 {
-  return (((SCHEME_TYPE(argv[0]) == scheme_regexp_type) 
+  return (((SCHEME_TYPE(argv[0]) == scheme_regexp_type)
 	   && (((regexp *)argv[0])->flags & REGEXP_IS_UTF8))
-	  ? scheme_true 
+	  ? scheme_true
 	  : scheme_false);
 }
 
 static Scheme_Object *byte_regexp_p(int argc, Scheme_Object *argv[])
 {
-  return (((SCHEME_TYPE(argv[0]) == scheme_regexp_type) 
+  return (((SCHEME_TYPE(argv[0]) == scheme_regexp_type)
 	   && !(((regexp *)argv[0])->flags & REGEXP_IS_UTF8))
-	  ? scheme_true 
+	  ? scheme_true
 	  : scheme_false);
 }
 
 static Scheme_Object *pregexp_p(int argc, Scheme_Object *argv[])
 {
-  return (((SCHEME_TYPE(argv[0]) == scheme_regexp_type) 
+  return (((SCHEME_TYPE(argv[0]) == scheme_regexp_type)
 	   && (((regexp *)argv[0])->flags & REGEXP_IS_UTF8)
 	   && (((regexp *)argv[0])->flags & REGEXP_IS_PCRE))
-	  ? scheme_true 
+	  ? scheme_true
 	  : scheme_false);
 }
 
 static Scheme_Object *byte_pregexp_p(int argc, Scheme_Object *argv[])
 {
-  return (((SCHEME_TYPE(argv[0]) == scheme_regexp_type) 
+  return (((SCHEME_TYPE(argv[0]) == scheme_regexp_type)
 	   && !(((regexp *)argv[0])->flags & REGEXP_IS_UTF8)
 	   && (((regexp *)argv[0])->flags & REGEXP_IS_PCRE))
-	  ? scheme_true 
+	  ? scheme_true
 	  : scheme_false);
 }
 
