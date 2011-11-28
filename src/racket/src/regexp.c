@@ -1458,6 +1458,14 @@ regatom(int *flagp, int parse_flags, int at_start)
 static int regcharclass(int c, char *map)
 {
   switch(c) {
+  /* Single-character regexp classes so that #px"\\n" matches "\n", etc. */
+  case 'n': map['\n'] = 1; break;
+  case 'r': map['\r'] = 1; break;
+  case 't': map['\t'] = 1; break;
+  case 'a': map['\a'] = 1; break;
+  case 'e': map['\e'] = 1; break; /* this might need to use (char)27 */
+  case 'f': map['\f'] = 1; break;
+  case 'v': map['\v'] = 1; break;
   case 'd':
     for (c = 0; c < 10; c++) {
       map['0' + c] = 1;
