@@ -9,7 +9,7 @@
   (test result regexp-match pattern input)
   (test result regexp-match (bytes-append #"(?:" pattern #")") input)
   (test result regexp-match (bytes-append #"(?:(?:" pattern #"))") input)
-  (test (and result (cons (car result) result)) 
+  (test (and result (cons (car result) result))
 	regexp-match (bytes-append #"(?:(" pattern #"))") input)
   (test result regexp-match (bytes-append #"(?:)" pattern #"") input)
   (test result regexp-match (bytes-append #"(?<=)" pattern #"") input)
@@ -26,6 +26,15 @@
   (test-regexp result pattern input)
   (test-regexp result pattern (bytes-append #"xxx" input #"xxx"))
   )
+
+(test-regexp-x '(#"\x00")   #"\\x00"   #"\x00")
+(test-regexp-x '(#"\n")     #"\\n"     #"\n")
+(test-regexp-x '(#"\r")     #"\\r"     #"\r")
+(test-regexp-x '(#"\t")     #"\\t"     #"\t")
+(test-regexp-x '(#"\a")     #"\\a"     #"\a")
+(test-regexp-x '(#"\e")     #"\\e"     #"\e")
+(test-regexp-x '(#"\f")     #"\\f"     #"\f")
+(test-regexp-x '(#"\v")     #"\\v"     #"\v")
 
 (test-regexp-x '(#"a") #"a" #"abc")
 (test-regexp '(#"a") #"^a" #"abc")
@@ -149,7 +158,7 @@
                     [mk (lambda (name extra not? star?)
                           ((if as-string? pregexp byte-pregexp)
                            ((if as-string? values string->bytes/latin-1)
-                            (format "[~a~a[:~a:]]~a" 
+                            (format "[~a~a[:~a:]]~a"
                                     (if not? "^" "")
                                     (if extra extra "")
                                     name
@@ -170,19 +179,19 @@
                                                    (= c (char->integer extra)))
                                               (predicate (integer->char c)))])
                                  (test (if in? (list (-bytes c)) #f)
-                                       regexp-match 
+                                       regexp-match
                                        b
                                        (-bytes c))
                                  (test (if in? (list (-bytes c c)) (list (-bytes)))
-                                       regexp-match 
+                                       regexp-match
                                        b*
                                        (-bytes c c))
                                  (test (if in? #f (list (-bytes c)))
-                                       regexp-match 
+                                       regexp-match
                                        not-b
                                        (-bytes c))
                                  (test (if in? (list (-bytes)) (list (-bytes c c)))
-                                       regexp-match 
+                                       regexp-match
                                        not-b*
                                        (-bytes c c))
                                  (loop (add1 c)))))
@@ -207,6 +216,10 @@
                                  (char-numeric? x))))
              )))
      '(#f #t))
+
+(test '("\u00E0") regexp-match "\\X"     "\u00E0")
+(test '("\u00E0") regexp-match "\\u00E0" "\u00E0")
+(test '("\u00E0") regexp-match "\\u{E0}" "\u00E0")
 
 (test '("app\u039Be") regexp-match #px"(?i:app\u039Be)" "app\u039Be")
 (test '("app\u039Be") regexp-match #px"(?i:app\u03BBe)" "app\u039Be")
@@ -252,8 +265,8 @@
 	    sigmas))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Most of the following tests are derived from "testinput" in 
-;; CL-PPCRE, which probably is from Perl originally. 
+;; Most of the following tests are derived from "testinput" in
+;; CL-PPCRE, which probably is from Perl originally.
 ;; The tests have been modified to avoid various incompatibilities.
 
 (define (make-reluctant-port bstr)
@@ -290,14 +303,14 @@
 			(map (lambda (v)
 			       (and v (bytes->string/latin-1 v)))
 			     (caddr t)))
-		   regexp-match 
+		   regexp-match
 		   (pregexp (bytes->string/latin-1 (car t)))
 		   (bytes->string/latin-1 (cadr t)))
 	     (test (and (caddr t)
 			(map (lambda (v)
 			       (and v (string->bytes/utf-8 (bytes->string/latin-1 v))))
 			     (caddr t)))
-		   regexp-match 
+		   regexp-match
 		   (pregexp (bytes->string/latin-1 (car t)))
 		   (open-input-string (bytes->string/latin-1 (cadr t)))))
 	   (begin
@@ -1616,7 +1629,7 @@
       [bformat (lambda (s v)
 		 (string->bytes/latin-1 (format s v)))])
   (for-each (lambda (str)
-	      (hash-set! ht 
+	      (hash-set! ht
                          (string->symbol (string-downcase str))
                          (vector
                           (byte-pregexp (bformat "\\p{~a}" str))
@@ -1632,10 +1645,10 @@
   (hash-for-each ht
                  (lambda (k v)
                    (let ([bad1 #"\377\377"]
-                         [bad2 (regexp-replace #rx#".$" 
+                         [bad2 (regexp-replace #rx#".$"
                                                (string->bytes/utf-8 "\U10FFF1")
                                                #"\377")]
-                         [bad3 (regexp-replace #rx#".$" 
+                         [bad3 (regexp-replace #rx#".$"
                                                (string->bytes/utf-8 "\u1234")
                                                #"")])
                      (test #f regexp-match (vector-ref v 0) bad1)
@@ -1709,7 +1722,7 @@
        (lambda (r bstr arg)
          (test (and r (list r))regexp-match (byte-pregexp bstr) arg)
          (test (and r (list (bytes->string/latin-1 r)) )
-               regexp-match 
+               regexp-match
                (pregexp (bytes->string/latin-1 bstr))
                (bytes->string/latin-1 arg)))])
   (test-both #f #"[\\s]" #"a")
@@ -1764,7 +1777,7 @@
   (try regexp-match? values (lambda (a) (and a #t)))
   (try regexp-match string->bytes/utf-8 (lambda (l) (map string->bytes/utf-8 l)))
   (try regexp-match open-input-string (lambda (l) (map string->bytes/utf-8 l)))
-  (try regexp-match-positions values 
+  (try regexp-match-positions values
        (lambda (s) (and s '((0 . 1))))
        (lambda (s) (and s '((1 . 2))))))
 
